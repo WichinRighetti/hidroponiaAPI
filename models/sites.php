@@ -1,5 +1,7 @@
 <?php
 
+use LDAP\Result;
+
 require_once('mysqlconnection.php');
 require_once('exceptions/lightNotFoundException.php');
 require_once('records.php');
@@ -93,7 +95,7 @@ class Site
                 $this->owner = $owner;
             } else {
                 // throw exception 
-                throw new ownerNotFoundException($id);
+                throw new RecordNotFoundException($id);
             }
             mysqli_stmt_close($command);
             $conn->close();
