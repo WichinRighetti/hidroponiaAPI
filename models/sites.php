@@ -164,11 +164,12 @@ class Site
     public function getRecords(){
         $list = array();
         $conn = MysqlConnection::getConnection();
-        $query = "SELECT s.name as Torre, s.location, s.Status, s.owner, r.Ph, r.Humidity, r.H2o, r.Light, r.Temperature, r.pump, r.dateTime
+        $query = "SELECT s.Id, s.name as Torre, s.location, s.Status, s.owner,r.Id , r.Ph, r.Humidity, r.H2o, r.Light, r.Temperature, r.pump, r.dateTime
         FROM sensorData r Left Join Sites s on r.siteId = s.id WHERE s.Id = ?";
         $command = $conn->prepare($query);
+        $command->bind_param('i', $this->id);
         $command->execute();
-        $command->bind_result($id, $ph, $humidity, $h2o, $light, $temperature, $pump, $dateTime, $siteId, $name, $location, $siteStatus, $owner);
+        $command->bind_result($id, $name, $location, $siteStatus, $owner, $siteId, $ph, $humidity, $h2o, $light, $temperature, $pump, $dateTime);
         while($command->fetch()){
             $site = new Site($siteId, $name, $location, $siteStatus, $owner);
             array_push($list, new Record($id, $ph, $humidity, $h2o, $light, $temperature, $pump, $dateTime, $site));
