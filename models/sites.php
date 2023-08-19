@@ -159,4 +159,27 @@ class Site
         //return result
         return $result;
     }
+
+    public function getRecords(){
+
+        return lista;
+    }
+
+    public function toJsonFull(){
+        //list
+        $recordsList = array();
+
+        foreach(self::getRecords() as $item){
+            array_push($recordsList, json_decode($item->toJson()));
+        }
+
+        return json_encode(array(
+                'Id' => $this->id,
+                'Name' => $this->name,
+                'Location' => $this->location,
+                'Status' => $this->status,
+                'Owner' => $this->owner,
+                'Records' => $recordsList
+        ));
+    }
 }
