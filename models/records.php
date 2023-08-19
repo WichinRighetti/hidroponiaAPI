@@ -1,6 +1,7 @@
 <?php
 
 require_once('mysqlconnection.php');
+require_once('sites.php');
 require_once('exceptions/recordNotFoundException.php');
 
 class Record
@@ -14,6 +15,7 @@ class Record
     private $temperature;
     private $pump;
     private $dateTime;
+    private $Site;
 
     // getter setters
     public function getId()
@@ -64,6 +66,14 @@ class Record
     {
         $this->temperature = $value;
     }
+    public function getPump()
+    {
+        return $this->pump;
+    }
+    public function setPump($value)
+    {
+        $this->pump = $value;
+    }
     public function getDateTime()
     {
         return $this->dateTime;
@@ -71,6 +81,14 @@ class Record
     public function setDateTime($value)
     {
         $this->dateTime = $value;
+    }
+    public function getSite()
+    {
+        return $this->Site;
+    }
+    public function setSite($value)
+    {
+        $this->Site = $value;
     }
 
     //constructors 
@@ -85,6 +103,7 @@ class Record
             $this->light = 0.0;
             $this->temperature = 0.0;
             $this->dateTime = "";
+            $this->Site = new Site();
         }
         //constructor  
         if (func_num_args() == 1) {
@@ -93,23 +112,30 @@ class Record
             //get connection 
             $conn = MysqlConnection::getConnection();
             //query 
-            $query = "SELECT Id, Ph, Humidity, H2o, Light, Temperature, Datetime  FROM Records WHERE Id = ?";
+            $query = "SELECT r.Id, r.Ph, r.Humidity, r.H2o, r.Light, r.Temperature, r.pump, r.dateTime, r.siteId, s.name, s.location, s.siteStatus, s.owner 
+            FROM sensorData r 
+            Left Join Sites s on r.siteId = s.id
+            WHERE r.Id = ?";
             //command
             $command = $conn->prepare($query);
             //bind params
             $command->bind_param('i', $id);
             $command->execute();
             //bind result
-            $command->bind_result($id, $ph, $humidity, $h2o, $light, $temperature, $dateTime);
+            $command->bind_result($id, $ph, $humidity, $h2o, $light, $temperature, $pump, $dateTime, $siteId, $name, $location, $siteStatus, $owner);
             //record was found 
             if ($command->fetch()) {
+                $site = new Site($siteId, $name, $location, $siteStatus, $owner);
+
                 $this->id = $id;
                 $this->ph = $ph;
                 $this->humidity = $humidity;
                 $this->h2o = $h2o;
                 $this->light = $light;
                 $this->temperature = $temperature;
+                $this->pump = $pump;
                 $this->dateTime = $dateTime;
+                $this->Site = $site;
             } else {
                 // throw exception 
                 throw new RecordNotFoundException($id);
@@ -118,7 +144,7 @@ class Record
             $conn->close();
         }
         //constructor with data from args
-        if (func_num_args() == 7) {
+        if (func_num_args() == 9) {
             $arguments = func_get_args();
             //pass arguments to attributes 
             $this->id = $arguments[0];
@@ -127,19 +153,24 @@ class Record
             $this->h2o = $arguments[3];
             $this->light = $arguments[4];
             $this->temperature = $arguments[5];
-            $this->dateTime = $arguments[6];
+            $this->pump = $arguments[6];
+            $this->dateTime = $arguments[7];
+            $this->Site = $arguments[8];
         }
     }
 
     public static function getAll(){
         $list = array();
         $conn = MysqlConnection::getConnection();
-        $query = " Select id, ph, humidity, h2o, light, temperature, datetime from records";
+        $query = "r.Id, r.Ph, r.Humidity, r.H2o, r.Light, r.Temperature, r.pump, r.dateTime, r.siteId, s.name, s.location, s.siteStatus, s.owner
+            sensorData r 
+            Left JOIN Site s on s.id = r.siteId ";
         $command = $conn->prepare($query);
         $command->execute();
-        $command->bind_result($id, $ph, $humidity, $h2o, $light, $temperature, $datetime);
+        $command->bind_result($id, $ph, $humidity, $h2o, $light, $temperature, $dateTime, $pump, $dateTime, $siteId, $name, $location, $siteStatus, $owner);
         while($command->fetch()){
-            array_push($list, new Record($id, $ph, $humidity, $h2o, $light, $temperature, $datetime));
+            $site = new Site($siteId, $name, $location, $siteStatus, $owner);
+            array_push($list, new Record($id, $ph, $humidity, $h2o, $light, $temperature, $pump, $dateTime, $site));
         }
         mysqli_stmt_close($command);
         $conn->close();
@@ -167,7 +198,9 @@ class Record
                 'h2o' => $this->h2o,
                 'light' => $this->light,
                 'temperature' => $this->temperature,
+                'pump' => $this->pump,
                 'datetime' => $this->dateTime,
+                'site' => json_decode($this->Site)
             )
         );
     }
