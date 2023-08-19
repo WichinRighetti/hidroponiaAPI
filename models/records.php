@@ -205,6 +205,22 @@ class Record
         );
     }
 
+    public function toJsontoSite()
+    {
+        return json_encode(
+            array(
+                'id' => $this->id,
+                'ph' => $this->ph,
+                'humidity' => $this->humidity,
+                'h2o' => $this->h2o,
+                'light' => $this->light,
+                'temperature' => $this->temperature,
+                'pump' => $this->pump,
+                'datetime' => $this->dateTime,
+            )
+        );
+    }
+
         function add(){
         //get connection
         $conn = MysqlConnection::getConnection();

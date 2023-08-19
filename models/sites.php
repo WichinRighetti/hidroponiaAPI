@@ -4,7 +4,7 @@ use LDAP\Result;
 
 require_once('mysqlconnection.php');
 require_once('exceptions/RecordNotFoundException.php');
-//require_once('records.php');
+require_once('records.php');
 
 class Site
 {
@@ -170,7 +170,7 @@ class Site
         $recordsList = array();
 
         foreach(self::getRecords() as $item){
-            array_push($recordsList, json_decode($item->toJson()));
+            array_push($recordsList, json_decode($item->toJsontoSite()));
         }
 
         return json_encode(array(
