@@ -1,0 +1,6 @@
+{
+    "server" : "mysqlserveritstep1.mysql.database.azure.com",
+    "database": "project",
+    "user": "saManager",
+    "password": "ITStepAcad3my1"
+}
