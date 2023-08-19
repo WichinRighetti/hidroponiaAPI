@@ -12,10 +12,10 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/hidroponiaAPI/models/sites.php');
 if ($_SERVER['REQUEST_METHOD'] == "GET") {
     if (isset($_GET['id'])) {
         try {
-            $r = new Site($_GET['id']);
+            $s = new Site($_GET['id']);
             echo json_encode(
                 array(
-                    json_decode($r->toJson())
+                    json_decode($s->toJsonFull())
                 )
             );
         } catch (RecordNotFoundException $ex) {
