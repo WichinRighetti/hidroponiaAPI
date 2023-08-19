@@ -64,6 +64,7 @@ class Site
             $this->location = "";
             $this->status = true;
             $this->owner = "";
+    
         }
         if(func_num_args()==1){
              //get id 
@@ -161,8 +162,20 @@ class Site
     }
 
     public function getRecords(){
-
-        return lista;
+        $list = array();
+        $conn = MysqlConnection::getConnection();
+        $query = "SELECT s.name as Torre, s.location, s.Status, s.owner, r.Ph, r.Humidity, r.H2o, r.Light, r.Temperature, r.pump, r.dateTime
+        FROM sensorData r Left Join Sites s on r.siteId = s.id WHERE s.Id = ?";
+        $command = $conn->prepare($query);
+        $command->execute();
+        $command->bind_result($id, $ph, $humidity, $h2o, $light, $temperature, $pump, $dateTime, $siteId, $name, $location, $siteStatus, $owner);
+        while($command->fetch()){
+            $site = new Site($siteId, $name, $location, $siteStatus, $owner);
+            array_push($list, new Record($id, $ph, $humidity, $h2o, $light, $temperature, $pump, $dateTime, $site));
+        }
+        mysqli_stmt_close($command);
+        $conn->close();
+        return $list;
     }
 
     public function toJsonFull(){
