@@ -149,7 +149,7 @@ class Site
         //command
         $command=$conn->prepare($query);
         //bind params
-        $command->bind_param('ssbs', $this->name, $this->location, $this->status, $this->owner);
+        $command->bind_param('ssis', $this->name, $this->location, $this->status, $this->owner);
         //execute
         $result = $command->execute();
         //close command

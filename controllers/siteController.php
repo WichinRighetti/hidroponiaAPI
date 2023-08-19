@@ -31,3 +31,33 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
         );
     }
 }
+
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    if (isset($_POST['Name']) && isset($_POST['Location']) && isset($_POST['Status']) && isset($_POST['Owner'])) {
+
+        $s = new Site();
+
+        $s->setName($_POST['Name']);
+        $s->setLocation($_POST['Location']);
+        $s->setStatus($_POST['Status']);
+        $s->setOwner($_POST['Owner']);
+        if ($s->add()) {
+            echo json_encode(array(
+                'status' => 0,
+                'message' => 'Site added Succesfully'
+            ));
+        } else {
+            echo json_encode(array(
+                'status' => 3,
+                'message' => 'Couldnt add'
+            ));
+        }
+    }
+    else {
+        echo json_encode(array(
+            'status' => 999,
+            'message' => 'Missing values'
+        ));
+    }
+    
+} 
