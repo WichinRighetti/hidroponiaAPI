@@ -162,12 +162,12 @@ class Record
     public static function getAll(){
         $list = array();
         $conn = MysqlConnection::getConnection();
-        $query = "r.Id, r.Ph, r.Humidity, r.H2o, r.Light, r.Temperature, r.pump, r.dateTime, r.siteId, s.name, s.location, s.siteStatus, s.owner
-            sensorData r 
-            Left JOIN Site s on s.id = r.siteId ";
+        $query = "Select r.Id, r.Ph, r.Humidity, r.H2o, r.Light, r.Temperature, r.pump, r.dateTime, r.siteId, s.name, s.location, s.Status, s.owner
+            From sensorData r 
+            Left JOIN Sites s on s.id = r.siteId ";
         $command = $conn->prepare($query);
         $command->execute();
-        $command->bind_result($id, $ph, $humidity, $h2o, $light, $temperature, $dateTime, $pump, $dateTime, $siteId, $name, $location, $siteStatus, $owner);
+        $command->bind_result($id, $ph, $humidity, $h2o, $light, $temperature, $pump, $dateTime, $siteId, $name, $location, $siteStatus, $owner);
         while($command->fetch()){
             $site = new Site($siteId, $name, $location, $siteStatus, $owner);
             array_push($list, new Record($id, $ph, $humidity, $h2o, $light, $temperature, $pump, $dateTime, $site));
@@ -200,7 +200,7 @@ class Record
                 'temperature' => $this->temperature,
                 'pump' => $this->pump,
                 'datetime' => $this->dateTime,
-                'site' => json_decode($this->Site)
+                'site' => json_decode($this->Site->toJson())
             )
         );
     }
@@ -209,11 +209,11 @@ class Record
         //get connection
         $conn = MysqlConnection::getConnection();
         //query
-        $query = 'INSERT INTO records (Ph, Humidity, H2o, Light, Temperature) values (?, ?, ?, ?, ?)';
+        $query = 'INSERT INTO sensorData (Ph, Humidity, H2o, Light, Temperature, pump, siteId) values (?, ?, ?, ?, ?, ?, ?)';
         //command
         $command=$conn->prepare($query);
         //bind params
-        $command->bind_param('dddid', $this->ph, $this->humidity, $this->h2o, $this->light, $this->temperature);
+        $command->bind_param('dddidii', $this->ph, $this->humidity, $this->h2o, $this->light, $this->temperature, $this->pump, $this->Site->getId());
         //execute
         $result = $command->execute();
         //close command
