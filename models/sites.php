@@ -3,8 +3,8 @@
 use LDAP\Result;
 
 require_once('mysqlconnection.php');
-require_once('exceptions/lightNotFoundException.php');
-require_once('records.php');
+require_once('exceptions/RecordNotFoundException.php');
+//require_once('records.php');
 
 class Site
 {
