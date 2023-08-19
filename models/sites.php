@@ -22,35 +22,35 @@ class Site
     {
         $this->id = $value;
     }
-    public function getname()
+    public function getName()
     {
         return $this->name;
     }
-    public function setname($value)
+    public function setName($value)
     {
         $this->name = $value;
     }
-    public function getlocation()
+    public function getLocation()
     {
         return $this->location;
     }
-    public function setlocation($value)
+    public function setLocation($value)
     {
         $this->location = $value;
     }
-    public function getstatus()
+    public function getStatus()
     {
         return $this->status;
     }
-    public function setstatus($value)
+    public function setStatus($value)
     {
         $this->status = $value;
     }
-    public function getowner()
+    public function getOwner()
     {
         return $this->owner;
     }
-    public function setowner($value)
+    public function setOwner($value)
     {
         $this->owner = $value;
     }
@@ -62,8 +62,8 @@ class Site
             $this->id =0;
             $this->name = "";
             $this->location = "";
-            $this->status = 0;
-            $this->owner = new Record();
+            $this->status = true;
+            $this->owner = "";
         }
         if(func_num_args()==1){
              //get id 
@@ -71,20 +71,13 @@ class Site
              //get connection 
              $conn = MysqlConnection::getConnection();
              //query 
-
-            //falta hacer el quety 
-
-
-             $query = "SELECT * FROM WHERE id = ?";
+             $query = "SELECT Id, Name, Location, Status, Owner FROM sites WHERE id = ?";
              //command
              $command = $conn->prepare($query);
              //bind params
              $command->bind_param('i', $id);
              $command->execute();
              //bind result
-
-            //falta traer los binds de owner 
-
              $command->bind_result($id, $name, $location, $status, $owner);
              //owner was found 
              if ($command->fetch()) {
@@ -100,6 +93,70 @@ class Site
             mysqli_stmt_close($command);
             $conn->close();
         }
+        if (func_num_args()==5){
+            $arguments = func_get_args();
+            $this->id = $arguments[0];
+            $this->name = $arguments[1];
+            $this->location = $arguments[2];
+            $this->status = $arguments[3];
+            $this->owner = $arguments[4];
+        }
     }
 
+    public static function getAll(){
+        $list = array();
+        $conn = MysqlConnection::getConnection();
+        $query = "SELECT Id, Name, Location, Status, Owner FROM sites";
+        $command = $conn->prepare($query);
+        $command->execute();
+        $command->bind_result($id, $name, $location, $status, $owner);
+        while($command->fetch()){
+            array_push($list, new Site($id, $name, $location, $status, $owner));
+        }
+        mysqli_stmt_close($command);
+        $conn->close();
+        return $list;
+    }
+
+    public static function getAllByJson(){
+        $list = array();
+        foreach(self::getAll() as $item){
+            array_push($list, json_decode($item->toJson()));
+        }
+
+        return json_encode($list);
+    }
+    
+
+    public function toJson()
+    {
+        return json_encode(
+            array(
+                'Id' => $this->id,
+                'Name' => $this->name,
+                'Location' => $this->location,
+                'Status' => $this->status,
+                'Owner' => $this->owner
+            )
+        );
+    }
+
+    function add(){
+        //get connection
+        $conn = MysqlConnection::getConnection();
+        //query
+        $query = 'INSERT INTO sites (Name, Location, Status, Owner) values (?, ?, ?, ?)';
+        //command
+        $command=$conn->prepare($query);
+        //bind params
+        $command->bind_param('ssbs', $this->name, $this->location, $this->status, $this->owner);
+        //execute
+        $result = $command->execute();
+        //close command
+        mysqli_stmt_close($command);
+        //Close connection
+        $conn->close();
+        //return result
+        return $result;
+    }
 }
