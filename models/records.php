@@ -112,7 +112,7 @@ class Record
             //get connection 
             $conn = MysqlConnection::getConnection();
             //query 
-            $query = "SELECT r.Id, r.Ph, r.Humidity, r.H2o, r.Light, r.Temperature, r.pump, r.dateTime, r.siteId, s.name, s.location, s.siteStatus, s.owner 
+            $query = "SELECT r.Id, r.Ph, r.Humidity, r.H2o, r.Light, r.Temperature, r.pump, r.dateTime, r.siteId, s.name, s.location, s.Status, s.owner 
             FROM sensorData r 
             Left Join Sites s on r.siteId = s.id
             WHERE r.Id = ?";
