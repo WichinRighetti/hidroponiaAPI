@@ -32,7 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    if (isset($_POST['id_site'], $_POST['Ph'], $_POST['Humidity'], $_POST['H2o'], $_POST['Light'], $_POST['Temperature'], $_POST['Pump'])) {
+    if (isset($_POST['id_site'], $_POST['Ph'], $_POST['Humidity'], 
+    $_POST['H2o'], $_POST['Light'], $_POST['Temperature'], $_POST['Pump'])) {
         //Error
         $error = false;
         //id_user
@@ -68,8 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 ));
             }   
         }
-    }
-    else {
+    } else {
         echo json_encode(array(
             'status' => 999,
             'message' => 'Missing values'
