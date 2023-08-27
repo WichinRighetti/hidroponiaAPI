@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    if (isset($_POST['Name']) && isset($_POST['Location']) && isset($_POST['Status']) && isset($_POST['Owner'])) {
+    if (isset($_POST['Name'], $_POST['Location'], $_POST['Status'], $_POST['Owner'])) {
 
         $s = new Site();
 
